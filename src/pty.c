@@ -89,10 +89,6 @@
 # include <sys/ptem.h>
 #endif
 
-#if !defined(SUN_SYSTEM) && !defined(VMS) && !defined(MACOS)
-# include <sys/ioctl.h>
-#endif
-
 #if defined(SUN_SYSTEM) && defined(LOCKPTY) && !defined(TIOCEXCL)
 # include <sys/ttold.h>
 #endif

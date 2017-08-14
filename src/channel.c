@@ -788,33 +788,13 @@ channel_open(
 		continue;
 	    }
 #else
-	    /* On Linux-like systems: See socket(7) for the behavior
-	     * After putting the socket in non-blocking mode, connect() will
-	     * return EINPROGRESS, select() will not wait (as if writing is
-	     * possible), need to use getsockopt() to check if the socket is
-	     * actually able to connect.
-	     * We detect a failure to connect when either read and write fds
-	     * are set.  Use getsockopt() to find out what kind of failure. */
 	    if (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
 	    {
-		ret = getsockopt(sd,
-			      SOL_SOCKET, SO_ERROR, &so_error, &so_error_len);
-		if (ret < 0 || (so_error != 0
-			&& so_error != EWOULDBLOCK
-			&& so_error != ECONNREFUSED
-# ifdef EINPROGRESS
-			&& so_error != EINPROGRESS
-# endif
-			))
-		{
-		    ch_error(channel,
-			    "channel_open: Connect failed with errno %d",
-			    so_error);
+		    ch_error(channel, "channel_open: Connect failed");
 		    PERROR(_(e_cannot_connect));
 		    sock_close(sd);
 		    channel_free(channel);
 		    return NULL;
-		}
 	    }
 
 	    if (FD_ISSET(sd, &wfds) && so_error == 0)
